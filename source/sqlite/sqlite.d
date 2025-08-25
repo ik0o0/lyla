@@ -43,6 +43,13 @@ void initSQLiteDatabase(const char* databaseName, Model[] models)
         return;
     }
 
+    char* errMsg = null;
+    if (sqlite3_exec(db, toStringz("PRAGMA foreign_keys = ON;"), null, null, &errMsg) != 0)
+    {
+        writeln("SQLite Error: ", errMsg);
+        free(errMsg);
+    }
+
     string strInitStmt = "";
     foreach (model; models)
     {
@@ -53,7 +60,6 @@ void initSQLiteDatabase(const char* databaseName, Model[] models)
     }
 
     const char* initStmt = toStringz(strInitStmt);
-    char* errMsg = null;
     if (sqlite3_exec(db, initStmt, null, null, &errMsg) != 0) {
         writeln("SQLite Error: ", errMsg);
         free(errMsg);

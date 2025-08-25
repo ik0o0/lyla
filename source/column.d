@@ -15,6 +15,8 @@
  */
 module column;
 
+import model;
+
 enum ColumnTypes
 {
     INTEGER,
@@ -31,12 +33,24 @@ private:
     bool autoIncrement = false;
     bool nullable = true;
     bool unique = false;
+    bool foreignKey = false;
+    Column columnRef;
+    Model modelRef;
 
 public:
     this(string columnName, ColumnTypes columnType)
     {
         this.columnName = columnName;
         this.columnType = columnType;
+    }
+
+    this(string columnName, ColumnTypes columnType, Model modelRef, Column columnRef)
+    {
+        this.columnName = columnName;
+        this.columnType = columnType;
+        this.modelRef = modelRef;
+        this.columnRef = columnRef;
+        this.foreignKey = true;
     }
 
     /*
@@ -66,6 +80,18 @@ public:
     // unique
     bool isUnique(){return this.unique;}
     void setUnique(bool unique){this.unique = unique;}
+
+    // foreignKey
+    bool isForeignKey(){return this.foreignKey;}
+    void setForeignKey(bool foreignKey){this.foreignKey = foreignKey;}
+
+    // columnRef
+    Column getColumnRef(){return this.columnRef;}
+    void setColumnRef(Column columnRef){this.columnRef = columnRef;}
+
+    // modelRef
+    Model getModelRef(){return this.modelRef;}
+    void setModelRef(Model modelRef){this.modelRef = modelRef;}
 }
 
 /*
@@ -82,12 +108,25 @@ unittest
     assert(c.isAutoIncrement() == false);
     assert(c.isNullable() == true);
     assert(c.isUnique() == false);
+    assert(c.isForeignKey() == false);
+    assert(c.getModelRef() is null);
+    assert(c.getColumnRef() is null);
+}
+
+// Constructor with references
+unittest
+{
+    auto col1 = new Column("id", ColumnTypes.INTEGER);
+    auto model = new Model("users", [col1]);
+    auto col2 = new Column("userId", ColumnTypes.INTEGER, model, model.getColumns()[0]);
+    assert(col2.isForeignKey() == true);
 }
 
 // Getters/setters
 unittest
 {
     auto c = new Column("username", ColumnTypes.TEXT);
+    auto model = new Model("users", [c]);
 
     c.setColumnName("user_name");
     assert(c.getColumnName() == "user_name");
@@ -106,4 +145,13 @@ unittest
 
     c.setUnique(true);
     assert(c.isUnique() == true);
+
+    c.setForeignKey(true);
+    assert(c.isForeignKey() == true);
+
+    c.setModelRef(model);
+    assert(c.getModelRef() == model);
+
+    c.setColumnRef(c);
+    assert(c.getColumnRef() == c);
 }
