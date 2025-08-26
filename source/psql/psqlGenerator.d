@@ -13,14 +13,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this project.  If not, see <https://www.gnu.org/licenses/>.
  */
-module sqlite.sqliteGenerator;
+module psql.psqlGenerator;
 
 import std.stdio;
 
-import sqlite.column;
-import sqlite.model;
+import psql.column;
+import psql.model;
 
-class SQLiteGenerator
+class PsqlGenerator
 {
 public:
 static:
@@ -29,7 +29,7 @@ static:
         return "CREATE TABLE IF NOT EXISTS " ~ tableName ~ "(" ~ columnStmt ~ ");";
     }
 
-    string createColumnStmt(SqliteColumn[] columns)
+    string createColumnStmt(PsqlColumn[] columns)
     {
         string stmtAcc;
         for (int i = 0; i < columns.length; i++)
@@ -49,12 +49,11 @@ static:
         return stmtAcc;
     }
 
-    string generateColumn(SqliteColumn column)
+    string generateColumn(PsqlColumn column)
     {
         string columnName = column.getColumnName();
-        SqliteColumnTypes columnType = column.getColumnType();
+        PsqlColumnTypes columnType = column.getColumnType();
         bool primaryKey = column.isPrimaryKey();
-        bool autoIncrement = column.isAutoIncrement();
         bool nullable = column.isNullable();
         bool unique = column.isUnique();
         bool foreignKey = column.isForeignKey();
@@ -66,14 +65,23 @@ static:
         
         switch(columnType)
         {
-            case SqliteColumnTypes.INTEGER:
+            case PsqlColumnTypes.INTEGER:
                 stmt ~= " INTEGER";
                 break;
-            case SqliteColumnTypes.TEXT:
+            case PsqlColumnTypes.SERIAL:
+                stmt ~= " SERIAL";
+                break;
+            case PsqlColumnTypes.TEXT:
                 stmt ~= " TEXT";
                 break;
-            case SqliteColumnTypes.BOOLEAN:
-                stmt ~= " INTEGER";
+            case PsqlColumnTypes.BOOLEAN:
+                stmt ~= " BOOLEAN";
+                break;
+            case PsqlColumnTypes.DATE:
+                stmt ~= " DATE";
+                break;
+            case PsqlColumnTypes.TIMESTAMP:
+                stmt ~= " TIMESTAMP";
                 break;
             default:
                 assert(0, "Unexpected column type.");
@@ -83,37 +91,38 @@ static:
 
         if (!nullable) stmt ~= " NOT NULL";
         if (primaryKey) stmt ~= " PRIMARY KEY";
-        if (autoIncrement) stmt ~= " AUTOINCREMENT";
         if (unique) stmt ~= " UNIQUE";
 
         return stmt;
     }
 
-    string generateFKColumn(SqliteColumn column)
+    string generateFKColumn(PsqlColumn column)
     {
         string columnName = column.getColumnName();
-        SqliteColumnTypes columnType = column.getColumnType();
+        PsqlColumnTypes columnType = column.getColumnType();
         bool primaryKey = column.isPrimaryKey();
-        bool autoIncrement = column.isAutoIncrement();
         bool nullable = column.isNullable();
         bool unique = column.isUnique();
-        SqliteModel modelRef = column.getModelRef();
-        SqliteColumn columnRef = column.getColumnRef();
+        PsqlModel modelRef = column.getModelRef();
+        PsqlColumn columnRef = column.getColumnRef();
 
         if (!columnRef.isUnique() && !columnRef.isPrimaryKey())
-            throw new Exception("Reference columns should be UNIQUE or PRIMARY KEY.");
+            throw new Exception("Reference's columns should be UNIQUE or PRIMARY KEY.");
 
         string stmt = columnName;
         switch(columnType)
         {
-            case SqliteColumnTypes.INTEGER:
+            case PsqlColumnTypes.INTEGER:
                 stmt ~= " INTEGER";
                 break;
-            case SqliteColumnTypes.TEXT:
+            case PsqlColumnTypes.SERIAL:
+                stmt ~= " SERIAL";
+                break;
+            case PsqlColumnTypes.TEXT:
                 stmt ~= " TEXT";
                 break;
-            case SqliteColumnTypes.BOOLEAN:
-                stmt ~= " INTEGER";
+            case PsqlColumnTypes.BOOLEAN:
+                stmt ~= " BOOLEAN";
                 break;
             default:
                 assert(0, "Unexpected column type.");
@@ -123,7 +132,6 @@ static:
 
         if (!nullable) stmt ~= " NOT NULL";
         if (primaryKey) stmt ~= " PRIMARY KEY";
-        if (autoIncrement) stmt ~= " AUTOINCREMENT";
         if (unique) stmt ~= " UNIQUE";
 
         stmt ~= ", FOREIGN KEY(" ~ columnName ~ ") REFERENCES " ~ modelRef.getTableName() ~ "(" ~ columnRef.getColumnName() ~ ")";
@@ -137,26 +145,25 @@ static:
 
 unittest
 {
-    SqliteColumn[] userColumns;
+    PsqlColumn[] userColumns;
 
-    userColumns ~= new SqliteColumn("id", SqliteColumnTypes.INTEGER);
+    userColumns ~= new PsqlColumn("id", PsqlColumnTypes.SERIAL);
     userColumns[0].setPrimaryKey(true);
-    userColumns[0].setAutoIncrement(true);
 
-    SqliteModel user = new SqliteModel("users_table", userColumns);
+    PsqlModel user = new PsqlModel("users_table", userColumns);
 
-    SqliteColumn[] postsColumns;
+    PsqlColumn[] postsColumns;
 
-    postsColumns ~= new SqliteColumn("id", SqliteColumnTypes.INTEGER);
+    postsColumns ~= new PsqlColumn("id", PsqlColumnTypes.SERIAL);
     postsColumns[0].setPrimaryKey(true);
-    postsColumns[0].setAutoIncrement(true);
 
-    postsColumns ~= new SqliteColumn("userId", SqliteColumnTypes.INTEGER, user, user.getColumns()[0]);
+    postsColumns ~= new PsqlColumn("userId", PsqlColumnTypes.INTEGER, user, user.getColumns()[0]);
 
-    SqliteModel posts = new SqliteModel("posts_table", postsColumns);
+    PsqlModel posts = new PsqlModel("posts_table", postsColumns);
 
-    assert(SQLiteGenerator.generateColumn(userColumns[0]) == "id INTEGER PRIMARY KEY AUTOINCREMENT");
-    assert(SQLiteGenerator.generateColumn(postsColumns[1]) == "userId INTEGER, FOREIGN KEY(userId) REFERENCES users_table(id)");
-    assert(SQLiteGenerator.createColumnStmt(postsColumns) == "id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER, FOREIGN KEY(userId) REFERENCES users_table(id)");
-    assert(SQLiteGenerator.createTableStmt(posts.getTableName(), "id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER, FOREIGN KEY(userId) REFERENCES users_table(id)") == "CREATE TABLE IF NOT EXISTS " ~ posts.getTableName() ~ "(id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER, FOREIGN KEY(userId) REFERENCES users_table(id));");
+    assert(PsqlGenerator.generateColumn(userColumns[0]) == "id SERIAL PRIMARY KEY");
+    assert(PsqlGenerator.generateColumn(postsColumns[1]) == "userId INTEGER, FOREIGN KEY(userId) REFERENCES users_table(id)");
+    assert(PsqlGenerator.createColumnStmt(postsColumns) == "id SERIAL PRIMARY KEY, userId INTEGER, FOREIGN KEY(userId) REFERENCES users_table(id)");
+    assert(PsqlGenerator.createTableStmt(posts.getTableName(), "id SERIAL PRIMARY KEY, userId INTEGER, FOREIGN KEY(userId) REFERENCES users_table(id)") == "CREATE TABLE IF NOT EXISTS " ~ posts.getTableName() ~ "(id SERIAL PRIMARY KEY, userId INTEGER, FOREIGN KEY(userId) REFERENCES users_table(id));");
 }
+

@@ -13,38 +13,41 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this project.  If not, see <https://www.gnu.org/licenses/>.
  */
-module column;
+module psql.column;
 
-import model;
+import psql.model;
 
-enum ColumnTypes
+enum PsqlColumnTypes
 {
     INTEGER,
+    SERIAL,
+    TIMESTAMP,
+    DATE,
     TEXT,
-    BOOLEAN
+    BOOLEAN,
+    // Implement varchar(n)
 }
 
-class Column
+class PsqlColumn
 {
 private:
     string columnName;
-    ColumnTypes columnType;
+    PsqlColumnTypes columnType;
     bool primaryKey = false;
-    bool autoIncrement = false;
     bool nullable = true;
     bool unique = false;
     bool foreignKey = false;
-    Column columnRef;
-    Model modelRef;
+    PsqlColumn columnRef;
+    PsqlModel modelRef;
 
 public:
-    this(string columnName, ColumnTypes columnType)
+    this(string columnName, PsqlColumnTypes columnType)
     {
         this.columnName = columnName;
         this.columnType = columnType;
     }
 
-    this(string columnName, ColumnTypes columnType, Model modelRef, Column columnRef)
+    this(string columnName, PsqlColumnTypes columnType, PsqlModel modelRef, PsqlColumn columnRef)
     {
         this.columnName = columnName;
         this.columnType = columnType;
@@ -62,16 +65,12 @@ public:
     void setColumnName(string columnName){this.columnName = columnName;}
 
     // columnType
-    ColumnTypes getColumnType(){return this.columnType;}
-    void setColumnType(ColumnTypes columnType){this.columnType = columnType;}
+    PsqlColumnTypes getColumnType(){return this.columnType;}
+    void setColumnType(PsqlColumnTypes columnType){this.columnType = columnType;}
 
     // primaryKey
     bool isPrimaryKey(){return this.primaryKey;}
     void setPrimaryKey(bool primaryKey){this.primaryKey = primaryKey;}
-    
-    // autoIncrement
-    bool isAutoIncrement(){return this.autoIncrement;}
-    void setAutoIncrement(bool autoIncrement){this.autoIncrement = autoIncrement;}
 
     // nullable
     bool isNullable(){return this.nullable;}
@@ -86,12 +85,12 @@ public:
     void setForeignKey(bool foreignKey){this.foreignKey = foreignKey;}
 
     // columnRef
-    Column getColumnRef(){return this.columnRef;}
-    void setColumnRef(Column columnRef){this.columnRef = columnRef;}
+    PsqlColumn getColumnRef(){return this.columnRef;}
+    void setColumnRef(PsqlColumn columnRef){this.columnRef = columnRef;}
 
     // modelRef
-    Model getModelRef(){return this.modelRef;}
-    void setModelRef(Model modelRef){this.modelRef = modelRef;}
+    PsqlModel getModelRef(){return this.modelRef;}
+    void setModelRef(PsqlModel modelRef){this.modelRef = modelRef;}
 }
 
 /*
@@ -101,11 +100,10 @@ public:
 // Constructor
 unittest
 {
-    auto c = new Column("id", ColumnTypes.INTEGER);
+    auto c = new PsqlColumn("id", PsqlColumnTypes.SERIAL);
     assert(c.getColumnName == "id");
-    assert(c.getColumnType == ColumnTypes.INTEGER);
+    assert(c.getColumnType == PsqlColumnTypes.SERIAL);
     assert(c.isPrimaryKey() == false);
-    assert(c.isAutoIncrement() == false);
     assert(c.isNullable() == true);
     assert(c.isUnique() == false);
     assert(c.isForeignKey() == false);
@@ -116,29 +114,26 @@ unittest
 // Constructor with references
 unittest
 {
-    auto col1 = new Column("id", ColumnTypes.INTEGER);
-    auto model = new Model("users", [col1]);
-    auto col2 = new Column("userId", ColumnTypes.INTEGER, model, model.getColumns()[0]);
+    auto col1 = new PsqlColumn("id", PsqlColumnTypes.SERIAL);
+    auto model = new PsqlModel("users", [col1]);
+    auto col2 = new PsqlColumn("userId", PsqlColumnTypes.INTEGER, model, model.getColumns()[0]);
     assert(col2.isForeignKey() == true);
 }
 
 // Getters/setters
 unittest
 {
-    auto c = new Column("username", ColumnTypes.TEXT);
-    auto model = new Model("users", [c]);
+    auto c = new PsqlColumn("username", PsqlColumnTypes.TEXT);
+    auto model = new PsqlModel("users", [c]);
 
     c.setColumnName("user_name");
     assert(c.getColumnName() == "user_name");
 
-    c.setColumnType(ColumnTypes.BOOLEAN);
-    assert(c.getColumnType() == ColumnTypes.BOOLEAN);
+    c.setColumnType(PsqlColumnTypes.BOOLEAN);
+    assert(c.getColumnType() == PsqlColumnTypes.BOOLEAN);
 
     c.setPrimaryKey(true);
     assert(c.isPrimaryKey() == true);
-
-    c.setAutoIncrement(true);
-    assert(c.isAutoIncrement() == true);
 
     c.setNullable(false);
     assert(c.isNullable == false);

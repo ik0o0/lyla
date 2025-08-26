@@ -19,8 +19,8 @@ import std.stdio;
 import std.string;
 import core.stdc.stdlib : free;
 
-import model;
-import column;
+import sqlite.model;
+import sqlite.column;
 import sqlite.sqliteGenerator;
 
 extern(C):
@@ -34,7 +34,7 @@ extern(C):
         char** errmsg                               // Error message
     );
 
-void initSQLiteDatabase(const char* databaseName, Model[] models)
+void initSQLiteDatabase(const char* databaseName, SqliteModel[] models)
 {
     void* db;
     if (sqlite3_open(databaseName, &db) != 0)
@@ -70,5 +70,5 @@ void initSQLiteDatabase(const char* databaseName, Model[] models)
  * Unit tests
  */
 
-// Unit test for initSQLiteDatabase() with :memory: should be writed but i struggle to do it so if you have a way to do it go on.
+// Unit test for initSQLiteDatabase() with :memory: should be writted but i struggle to do it so if you have a way to do it go on.
 // Check CONTRIBUTIONS.md and submit your PR.
