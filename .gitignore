@@ -17,3 +17,6 @@ lyla-test-*
 *.db
 lyla
 app.d
+
+.vscode
+.idea
