@@ -13,19 +13,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this project.  If not, see <https://www.gnu.org/licenses/>.
  */
-module model;
+module psql.model;
 
-import column;
-import sqlite.sqlite;
+import psql.column;
 
-class Model
+class PsqlModel
 {
 private:
     string tableName;
-    Column[] columns;
+    PsqlColumn[] columns;
 
 public:
-    this(string tableName, Column[] columns)
+    this(string tableName, PsqlColumn[] columns)
     {
         this.tableName = tableName;
         this.columns = columns;
@@ -41,8 +40,8 @@ public:
     void setTableName(string tableName){this.tableName = tableName;}
 
     // columns
-    Column[] getColumns(){return this.columns;}
-    void setColumns(Column[] columns){this.columns = columns;}
+    PsqlColumn[] getColumns(){return this.columns;}
+    void setColumns(PsqlColumn[] columns){this.columns = columns;}
 }
 
 /*
@@ -52,10 +51,10 @@ public:
 // Constructor
 unittest
 {
-    auto col1 = new Column("id", ColumnTypes.INTEGER);
-    auto col2 = new Column("username", ColumnTypes.TEXT);
+    auto col1 = new PsqlColumn("id", PsqlColumnTypes.SERIAL);
+    auto col2 = new PsqlColumn("username", PsqlColumnTypes.TEXT);
 
-    auto model = new Model("users", [col1, col2]);
+    auto model = new PsqlModel("users", [col1, col2]);
     assert(model.getTableName() == "users");
     assert(model.getColumns().length == 2);
     assert(model.getColumns[0] == col1);
@@ -65,9 +64,9 @@ unittest
 // Getters/setters
 unittest
 {
-    auto col1 = new Column("id", ColumnTypes.INTEGER);
-    auto col2 = new Column("username", ColumnTypes.TEXT);
-    auto model = new Model("users", [col1]);
+    auto col1 = new PsqlColumn("id", PsqlColumnTypes.SERIAL);
+    auto col2 = new PsqlColumn("username", PsqlColumnTypes.TEXT);
+    auto model = new PsqlModel("users", [col1]);
 
     model.setTableName("accounts");
     assert(model.getTableName() == "accounts");
@@ -82,7 +81,7 @@ unittest
 // Constructor with empty vector
 unittest
 {
-    auto model = new Model("empty_table", []);
+    auto model = new PsqlModel("empty_table", []);
     assert(model.getColumns().length == 0);
     assert(model.getTableName() == "empty_table");
 }
