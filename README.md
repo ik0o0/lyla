@@ -11,21 +11,22 @@ Currently, Lyla supports SQLite (via the C API). PostgreSQL support is planned f
 Lyla/
 │
 ├─ source/
+│  ├─ psql/
+│  │  ├─ psql.d
+│  │  ├─ psqlGenerator.d
+│  │  ├─ column.d
+│  │  └─ model.d
 │  ├─ sqlite/
 │  │  ├─ sqlite.d
-│  │  └─ sqliteGenerator.d
-│  ├─ column.d
-│  └─ model.d
+│  │  ├─ sqliteGenerator.d
+│  │  ├─ column.d
+│  │  └─ model.d
 ```
-- ```sqlite/``` — Contains SQLite integration and SQL generator logic.
-- ```column.d``` — Defines the ```Column``` class and column types.
-- ```model.d``` — Defines the ```Model``` class for representing database tables.
 
 ## ✨ Features
 - 🎯 Lightweight abstraction for interacting with relational tables
-- 📦 Minimal dependencies (directly uses SQLite C API)
+- 📦 Minimal dependencies (directly uses C API)
 - 🪶 Handles table creation with columns, primary keys, uniqueness, nullable, and auto-increment properties
-- 🔜 Planned PostgreSQL support
 
 ## 🚀 Installation & Usage
 Lyla is currently not distributed via a package manager.
@@ -41,22 +42,22 @@ To use it:
 ```d
 import std.stdio;
 import sqlite.sqlite;
-import model;
-import column;
+import sqlite.model;
+import sqlite.column;
 
 void main()
 {
   // Define columns
-  auto idColumn = new Column("id", ColumnTypes.INTEGER);
+  auto idColumn = new SqliteColumn("id", ColumnTypes.INTEGER);
   idColumn.setPrimaryKey(true);
   idColumn.setAutoIncrement(true);
 
-  auto nameColumn = new Column("username", ColumnTypes.TEXT);
+  auto nameColumn = new SqliteColumn("username", ColumnTypes.TEXT);
   nameColumn.setUnique(true);
   nameColumn.setNullable(false);
 
   // Define table model
-  auto userModel = new Model("users", [idColumn, nameColumn]);
+  auto userModel = new SqliteModel("users", [idColumn, nameColumn]);
 
   // Initialize SQLite database
   initSQLiteDatabase("example.db", [userModel]);
@@ -67,14 +68,14 @@ This will create a SQLite database example.db with a users table containing id a
 
 ## 🛣️ Roadmap
 - ✅ SQLite support
-- ❌ PostgreSQL support
+- ✅ PostgreSQL support
 - ❌ Starter template for easier project integration
 - ❌ Extra abstraction layer for higher-level operations
 - ❌ CRUD operations
 
 ## 🧪 Testing
 - Unit tests are included in each module (```unittest``` blocks).
-- Example: ```column.d``` includes tests for ```Column``` getters/setters.
+- Example: ```sqlite/column.d``` includes tests for ```SqliteColumn``` getters/setters.
 - Tests can be run with the D compiler using dub test if configured.
 
 ## 📜 License
