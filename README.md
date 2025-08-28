@@ -5,7 +5,7 @@
 Lyla is a lightweight D library for interacting with relational databases.
 It provides a minimal ORM-like abstraction to handle tables as objects without relying on deprecated drivers or full ORM frameworks.
 
-Currently, Lyla supports SQLite (via the C API). PostgreSQL support is planned for future versions.
+Currently, Lyla supports SQLite and PostgreSQL (via the C API).
 
 ```
 Lyla/
