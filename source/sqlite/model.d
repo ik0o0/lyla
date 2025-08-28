@@ -31,6 +31,15 @@ public:
         this.columns = columns;
     }
 
+    SqliteColumn getColumnByName(string name)
+    {
+        foreach (SqliteColumn col; columns)
+        {
+            if (col.getColumnName() == name)
+                return col;
+        }
+        throw new Exception("There is no column named: " ~ name);
+    }
 
     /*
      *  Getter and setters
