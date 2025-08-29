@@ -59,11 +59,11 @@ void main()
       .finalize()
       .build();
 
-  initSQLiteDatabase("database.db", [User, Post]);
+  initSQLiteDatabase("example.db", [User, Post]);
 }
 ```
 
-This will create a SQLite database example.db with a users table containing id and username columns.
+This will create a SQLite database example.db with a users table containing id and username columns and a posts table containing id and userId columns.
 
 ## 🛣️ Roadmap
 - ✅ SQLite support
