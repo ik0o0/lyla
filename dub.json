@@ -2,7 +2,7 @@
 	"authors": [
 		"Noé Huart <noehuart.pro@gmail.com>"
 	],
-	"description": "A simple open source ORM for D.",
+	"description": "Lyla is a lightweight, open-source ORM for D designed with simplicity in mind. It maps your database directly to your code—what you see in your tables is exactly what you work with in the ORM. No unnecessary abstractions, no metaprogramming tricks, and no external dependencies—just direct C API access to SQLite and PostgreSQL. Lyla aims to be a stable, reliable alternative that won't break or get deprecated, letting you focus on your data, not the framework.",
 	"license": "LGPL-3.0",
 	"name": "lyla",
 	"targetType": "library",
