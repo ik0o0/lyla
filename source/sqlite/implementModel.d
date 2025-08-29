@@ -173,12 +173,12 @@ unittest
     SqliteModel Post = new SqliteImplementModel("posts_table")
         .column("id", SqliteColumnTypes.INTEGER).primaryKey().autoIncrement()
         .column("title", SqliteColumnTypes.TEXT)
-        .column("userId", SqliteColumnTypes.INTEGER, User, User.getColumnByName("id"))
+        .column("userId", SqliteColumnTypes.INTEGER, User, User.column("id"))
         .finalize()
         .build();
     
-    assert(User.getColumnByName("id").isPrimaryKey() == true);
-    assert(User.getColumnByName("username").isUnique() == true);
-    assert(Post.getColumnByName("title").isNullable() == true);
-    assert(Post.getColumnByName("userId").isForeignKey() == true);
+    assert(User.column("id").isPrimaryKey() == true);
+    assert(User.column("username").isUnique() == true);
+    assert(Post.column("title").isNullable() == true);
+    assert(Post.column("userId").isForeignKey() == true);
 }

@@ -31,7 +31,7 @@ public:
         this.columns = columns;
     }
 
-    SqliteColumn getColumnByName(string name)
+    SqliteColumn column(string name)
     {
         foreach (SqliteColumn col; columns)
         {
