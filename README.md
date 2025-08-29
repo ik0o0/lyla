@@ -19,6 +19,7 @@ Lyla/
 │  ├─ sqlite/
 │  │  ├─ sqlite.d
 │  │  ├─ sqliteGenerator.d
+│  │  ├─ implementModel.d
 │  │  ├─ column.d
 │  │  └─ model.d
 ```
@@ -40,27 +41,25 @@ To use it:
 
 ### Minimal Example
 ```d
-import std.stdio;
 import sqlite.sqlite;
-import sqlite.model;
-import sqlite.column;
+import sqlite.column : SqliteColumnTypes;
+import sqlite.implementModel;
 
 void main()
 {
-  // Define columns
-  auto idColumn = new SqliteColumn("id", ColumnTypes.INTEGER);
-  idColumn.setPrimaryKey(true);
-  idColumn.setAutoIncrement(true);
+  auto User = new SqliteImplementModel("users_table")
+      .column("id", SqliteColumnTypes.INTEGER).primaryKey().autoIncrement()
+      .column("username", SqliteColumnTypes.TEXT).notNull().unique()
+      .finalize()
+      .build();
 
-  auto nameColumn = new SqliteColumn("username", ColumnTypes.TEXT);
-  nameColumn.setUnique(true);
-  nameColumn.setNullable(false);
+  auto Post = new SqliteImplementModel("posts_table")
+      .column("id", SqliteColumnTypes.INTEGER).primaryKey().autoIncrement()
+      .column("userId", SqliteColumnTypes.INTEGER, User, User.getColumnByName("id")) // FK column REF user.id
+      .finalize()
+      .build();
 
-  // Define table model
-  auto userModel = new SqliteModel("users", [idColumn, nameColumn]);
-
-  // Initialize SQLite database
-  initSQLiteDatabase("example.db", [userModel]);
+  initSQLiteDatabase("database.db", [User, Post]);
 }
 ```
 
@@ -69,8 +68,9 @@ This will create a SQLite database example.db with a users table containing id a
 ## 🛣️ Roadmap
 - ✅ SQLite support
 - ✅ PostgreSQL support
+- ✅ Extra abstraction layer for SQLite
+- ❌ Extra abstraction layer for PostgreSQL
 - ❌ Starter template for easier project integration
-- ❌ Extra abstraction layer for higher-level operations
 - ❌ CRUD operations
 
 ## 🧪 Testing
