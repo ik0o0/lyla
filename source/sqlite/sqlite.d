@@ -85,6 +85,19 @@ extern(C)
         int nByte,
         void function(void*) destructor
     );
+    int sqlite3_bind_int(
+        sqlite3_stmt* stmt,
+        int index,
+        int value
+    );
+    int sqlite3_bind_double(
+        sqlite3_stmt* stmt,
+        int index,
+        double value
+    );
+    int sqlite3_column_count(sqlite3_stmt* stmt);
+    const(char)* sqlite3_column_name(sqlite3_stmt* stmt, int iCol);
+    const(char)* sqlite3_column_text(sqlite3_stmt* stmt, int iCol);
     int sqlite3_step(sqlite3_stmt* stmt);
     const(char)* sqlite3_errmsg(sqlite3* db);
     int sqlite3_finalize(sqlite3_stmt* stmt);
