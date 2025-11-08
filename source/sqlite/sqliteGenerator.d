@@ -16,6 +16,7 @@
 module sqlite.sqliteGenerator;
 
 import std.stdio;
+import std.conv;
 
 import sqlite.column;
 import sqlite.model;
@@ -29,21 +30,17 @@ static:
         return "CREATE TABLE IF NOT EXISTS " ~ tableName ~ "(" ~ columnStmt ~ ");";
     }
 
-    string createColumnStmt(SqliteColumn[] columns)
+    string createColumnStmt(SqliteColumn[string] columns)
     {
         string stmtAcc;
-        for (int i = 0; i < columns.length; i++)
+        int i = 0;
+        foreach (SqliteColumn column; columns)
         {
-            if (i == columns.length - 1)
-            {
-                string stmt = generateColumn(columns[i]);
-                stmtAcc ~= stmt;
-            }
+            if (i != columns.length - 1)
+                stmtAcc ~= generateColumn(column) ~ ", ";
             else
-            {
-                string stmt = generateColumn(columns[i]);
-                stmtAcc ~= stmt ~ ", ";
-            }
+                stmtAcc ~= generateColumn(column);
+            ++i;
         }
 
         return stmtAcc;

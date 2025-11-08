@@ -23,12 +23,12 @@ import sqlite.model;
 class SqliteImplementModel
 {
 private:
-    SqliteColumn[] columns;
+    SqliteColumn[string] columns;
     SqliteColumn currentColumn;
 
     string tableName;
 public:
-    SqliteColumn[] getColumns()
+    SqliteColumn[string] getColumns()
     {
         return this.columns;
     }
@@ -41,22 +41,22 @@ public:
     // for standard column
     SqliteImplementModel column(string columnName, SqliteColumnTypes columnType)
     {
-        if (this.currentColumn !is null)
-        {
-            this.columns ~= this.currentColumn;
-        }
-        this.currentColumn = new SqliteColumn(columnName, columnType);
+        // if (this.currentColumn !is null)
+        // {
+        //     this.columns[this.currentColumn.getColumnName()] = this.currentColumn;
+        // }
+        // this.currentColumn = new SqliteColumn(columnName, columnType);
+
+        this.columns[columnName] = new SqliteColumn(columnName, columnType);
+        this.currentColumn = this.columns[columnName];
         return this;
     }
 
     // for foreign key column
     SqliteImplementModel column(string columnName, SqliteColumnTypes columnType, SqliteModel modelRef, SqliteColumn columnRef)
     {
-        if (this.currentColumn !is null)
-        {
-            this.columns ~= this.currentColumn;
-        }
-        this.currentColumn = new SqliteColumn(columnName, columnType, modelRef, columnRef);
+        this.columns[columnName] = new SqliteColumn(columnName, columnType, modelRef, columnRef);
+        this.currentColumn = this.columns[columnName];
         return this;
     }
 
@@ -116,14 +116,6 @@ public:
         }
     }
 
-    // insert the current column into the column array
-    SqliteImplementModel finalize()
-    {
-        if (this.currentColumn !is null)
-            this.columns ~= this.currentColumn;
-        return this;
-    }
-
     // creates a new SqliteModel and returns it
     SqliteModel build()
     {
@@ -173,12 +165,12 @@ unittest
     SqliteModel Post = new SqliteImplementModel("posts_table")
         .column("id", SqliteColumnTypes.INTEGER).primaryKey().autoIncrement()
         .column("title", SqliteColumnTypes.TEXT)
-        .column("userId", SqliteColumnTypes.INTEGER, User, User.getColumnByName("id"))
+        .column("userId", SqliteColumnTypes.INTEGER, User, User.column("id"))
         .finalize()
         .build();
     
-    assert(User.getColumnByName("id").isPrimaryKey() == true);
-    assert(User.getColumnByName("username").isUnique() == true);
-    assert(Post.getColumnByName("title").isNullable() == true);
-    assert(Post.getColumnByName("userId").isForeignKey() == true);
+    assert(User.column("id").isPrimaryKey() == true);
+    assert(User.column("username").isUnique() == true);
+    assert(Post.column("title").isNullable() == true);
+    assert(Post.column("userId").isForeignKey() == true);
 }

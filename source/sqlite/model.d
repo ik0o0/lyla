@@ -22,23 +22,21 @@ class SqliteModel
 {
 private:
     string tableName;
-    SqliteColumn[] columns;
+    SqliteColumn[string] columns;
 
 public:
-    this(string tableName, SqliteColumn[] columns)
+    this(string tableName, SqliteColumn[string] columns)
     {
         this.tableName = tableName;
         this.columns = columns;
     }
 
-    SqliteColumn getColumnByName(string name)
+    SqliteColumn column(string name)
     {
-        foreach (SqliteColumn col; columns)
-        {
-            if (col.getColumnName() == name)
-                return col;
-        }
-        throw new Exception("There is no column named: " ~ name);
+        if (columns[name] is null)
+            throw new Exception("There is no column named: " ~ name);
+
+        return columns[name];
     }
 
     /*
@@ -50,8 +48,8 @@ public:
     void setTableName(string tableName){this.tableName = tableName;}
 
     // columns
-    SqliteColumn[] getColumns(){return this.columns;}
-    void setColumns(SqliteColumn[] columns){this.columns = columns;}
+    SqliteColumn[string] getColumns(){return this.columns;}
+    void setColumns(SqliteColumn[string] columns){this.columns = columns;}
 }
 
 /*

@@ -15,6 +15,7 @@ lyla-test-*
 *.obj
 *.lst
 *.db
+*.a
 lyla
 app.d
 
