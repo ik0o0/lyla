@@ -23,12 +23,12 @@ import sqlite.model;
 class SqliteImplementModel
 {
 private:
-    SqliteColumn[] columns;
+    SqliteColumn[string] columns;
     SqliteColumn currentColumn;
 
     string tableName;
 public:
-    SqliteColumn[] getColumns()
+    SqliteColumn[string] getColumns()
     {
         return this.columns;
     }
@@ -41,22 +41,22 @@ public:
     // for standard column
     SqliteImplementModel column(string columnName, SqliteColumnTypes columnType)
     {
-        if (this.currentColumn !is null)
-        {
-            this.columns ~= this.currentColumn;
-        }
-        this.currentColumn = new SqliteColumn(columnName, columnType);
+        // if (this.currentColumn !is null)
+        // {
+        //     this.columns[this.currentColumn.getColumnName()] = this.currentColumn;
+        // }
+        // this.currentColumn = new SqliteColumn(columnName, columnType);
+
+        this.columns[columnName] = new SqliteColumn(columnName, columnType);
+        this.currentColumn = this.columns[columnName];
         return this;
     }
 
     // for foreign key column
     SqliteImplementModel column(string columnName, SqliteColumnTypes columnType, SqliteModel modelRef, SqliteColumn columnRef)
     {
-        if (this.currentColumn !is null)
-        {
-            this.columns ~= this.currentColumn;
-        }
-        this.currentColumn = new SqliteColumn(columnName, columnType, modelRef, columnRef);
+        this.columns[columnName] = new SqliteColumn(columnName, columnType, modelRef, columnRef);
+        this.currentColumn = this.columns[columnName];
         return this;
     }
 
@@ -114,14 +114,6 @@ public:
         {
             throw new Exception("Cannot call this method without having created a column.");
         }
-    }
-
-    // insert the current column into the column array
-    SqliteImplementModel finalize()
-    {
-        if (this.currentColumn !is null)
-            this.columns ~= this.currentColumn;
-        return this;
     }
 
     // creates a new SqliteModel and returns it

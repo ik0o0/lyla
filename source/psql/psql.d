@@ -59,21 +59,21 @@ extern(C)
     void PQclear(PGresult* res);
 }
 
-void initPsqlDatabase(
+PGconn* initPsqlDatabase(
     string host,
+    string port,
     string dbname,
     string user,
     string password,
     PsqlModel[] models
 )
 {
-    PGconn* conn = PQconnectdb(toStringz("host=" ~ host ~ "dbname=" ~ dbname ~ "user=" ~ user ~ "password=" ~ password));
+    PGconn* conn = PQconnectdb(toStringz("host=" ~ host ~ "port=" ~ port ~ "dbname=" ~ dbname ~ "user=" ~ user ~ "password=" ~ password));
     if (PQstatus(conn) != ConnStatusType.CONNECTION_OK)
     {
         char* errMsg = PQerrorMessage(conn);
         PQfinish(conn);
         throw new Exception("Connection error: ", fromStringz(errMsg).idup);
-        return;
     }
 
     string initStmt = "";
@@ -91,13 +91,12 @@ void initPsqlDatabase(
         PQclear(res);
         PQfinish(conn);
         throw new Exception("Error in the query: ", fromStringz(errMsg).idup);
-        return;
     }
 
     PQclear(res);
     PQfinish(conn);
 
-    return;
+    return conn;
 }
 
 /*
