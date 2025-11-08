@@ -31,16 +31,15 @@ Lyla/
 - ⚙️ CRUD operations
 
 ## 🚀 Installation & Usage
-Lyla is currently not distributed via a package manager.
+Lyla is currently distributed via DUB.
 
 Lyla SQLite is ready!
 
 To use it:
 
-1. Copy the ```lyla/``` folder into your D project.
-2. Import the relevant modules (```sqlite```, ```model```, ```column```) in your code.
-3. Add ```"libs": ["sqlite3"]``` to your dub.json or the equivalent in sdl.
-5. Compile your project normally.
+1. dub add lyla
+2. Import the relevant modules (```sqlite```, ```implementModel```, ```column```) in your code.
+3. dub build
 
 ### Minimal Example
 ```d
