@@ -5,7 +5,6 @@
 	"description": "Lyla is a simple, stable ORM for D using C APIs for SQLite/PostgreSQL. No metaprogramming, no extra dependencies—just direct, predictable database mapping.",
 	"license": "LGPL-3.0",
 	"name": "lyla",
-	"targetType": "library",
 	"libs": [
 		"sqlite3",
 		"pq"

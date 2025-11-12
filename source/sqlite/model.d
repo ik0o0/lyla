@@ -33,7 +33,7 @@ public:
 
     SqliteColumn column(string name)
     {
-        if (columns[name] is null)
+        if (name !in this.columns)
             throw new Exception("There is no column named: " ~ name);
 
         return columns[name];

@@ -140,6 +140,7 @@ sqlite3* initSQLiteDatabase(const char* databaseName, SqliteModel[] models)
         sqlite3_free(errMsg);
     }
 
+    // sqlite3_close(db);
     return db;
 }
 
