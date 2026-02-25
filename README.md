@@ -62,20 +62,26 @@ void main()
     .column("userId", SqliteColumnTypes.INTEGER, User, User.column("id"))
     .build();
   
-  auto db = initSQLiteDatabase("example-database.db", [User, Post]);
+  auto databases = [
+    1: createDatabase("lyla-database1.db", [User, Post]),
+    2: createDatabase("lyla-database2.db", [User, Post])
+  ];
 
-  auto userRepository = new SqliteRepository(User, db);
-  auto postRepository = new SqliteRepository(Post, db);
+  auto userRepository = new SqliteRepository(User, [databases[1], databases[2]]);
+  auto postRepository = new SqliteRepository(Post, [databases[1], databases[2]]);
 
   userRepository.insert(
     [User.column("username"), User.column("password")],
-    [toVariant("testName"), toVariant("testPass")]
+    [toVariant("testUsername"), toVariant("testPass")]
   );
 
-  string userId = userRepository
-    .select([User.column("id")])
-    .where(User.column("username"), Operators.equal, "testName")
-    .execute()[0]["id"];
+  auto res = userRepository
+    .select()
+    .where(User.column("username"), Operators.equal, "testUsername")
+    .limit(2)
+    .execute();
+  
+  string userId = res[0]["id"];
 
   foreach (i; i..5)
   {
@@ -85,7 +91,7 @@ void main()
     );
   }
 
-  string[string][] res = postRepository
+  string[string][] pRes = postRepository
     .select()
     .where(Post.column("userId"), Operators.equal, 1)
     .orderBy([Post.column("id")], SortMethod.ASC)
@@ -109,7 +115,7 @@ This minimal example shows how to define and use SQLite models with Lyla. It cre
 - ✅ SQLite support
 - ✅ Extra abstraction layer for SQLite
 - ✅ CRUD operations for SQLite
-- ❌ Pool management for SQLite
+- ✅ Pool management for SQLite
 - ✅ PostgreSQL support
 - ❌ Extra abstraction layer for PostgreSQL
 - ❌ CRUD operations for PostgreSQL
